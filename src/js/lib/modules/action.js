@@ -8,6 +8,7 @@ $.prototype.html = function (content) {
             return this[i].innerHTML;
         }
     }
+    console.log(this);
     return this;
 };
 
