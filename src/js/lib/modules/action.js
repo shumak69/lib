@@ -59,3 +59,34 @@ $.prototype.find = function (selector) {
     }
     return this;
 };
+
+$.prototype.closest = function (selector) {
+    let counter = 0;
+
+    for (let i = 0; i < this.length; i++) {
+        if(this[i].closest(selector) === null) {
+            return this;
+        } else {
+            this[i] = this[i].closest(selector);
+            counter++;
+        }
+        
+    }
+    for(; counter < Object.keys(this).length; counter++) {
+        delete this[counter];
+    }
+    return this;
+};
+
+$.prototype.siblings = function () {
+    console.log([...this[0].parentElement.children]);
+    const newObj = [...this[0].parentElement.children].filter(item => item !== this[0]);
+    
+    for (let i = 0; i < this.length; i++) {
+        delete this[i];
+    }
+    
+    Object.assign(this, newObj);
+    this.length = newObj.length;
+    return this;
+};
