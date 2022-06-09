@@ -123,7 +123,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../core */ "./src/js/lib/core.js");
 
 
-_core__WEBPACK_IMPORTED_MODULE_0__["default"].prototype.modal = function () {
+_core__WEBPACK_IMPORTED_MODULE_0__["default"].prototype.modal = function (isCreated) {
   const scrolls = calcScroll();
 
   function calcScroll() {
@@ -144,29 +144,95 @@ _core__WEBPACK_IMPORTED_MODULE_0__["default"].prototype.modal = function () {
       e.preventDefault();
       Object(_core__WEBPACK_IMPORTED_MODULE_0__["default"])(target).fadeIn(500);
       document.body.style.overflow = 'hidden';
-      console.log(scrolls);
       document.body.style.marginRight = `${scrolls}px`;
     });
-  }
+    const closeElements = document.querySelectorAll(`${target} [data-close]`);
+    closeElements.forEach(item => {
+      Object(_core__WEBPACK_IMPORTED_MODULE_0__["default"])(item).click(() => {
+        Object(_core__WEBPACK_IMPORTED_MODULE_0__["default"])(target).fadeOut(500);
+        document.body.style.overflow = '';
+        document.body.style.marginRight = `0`;
 
-  const closeElements = document.querySelectorAll('[data-close]');
-  closeElements.forEach(item => {
-    Object(_core__WEBPACK_IMPORTED_MODULE_0__["default"])(item).click(() => {
-      Object(_core__WEBPACK_IMPORTED_MODULE_0__["default"])('.modal').fadeOut(500);
-      document.body.style.overflow = '';
-      document.body.style.marginRight = `0`;
+        if (isCreated) {
+          document.querySelector(target).remove();
+        }
+      });
     });
-  });
-  Object(_core__WEBPACK_IMPORTED_MODULE_0__["default"])('.modal').click(e => {
-    if (e.target.classList.contains('modal')) {
-      Object(_core__WEBPACK_IMPORTED_MODULE_0__["default"])('.modal').fadeOut(500);
-      document.body.style.overflow = '';
-      document.body.style.marginRight = `0`;
-    }
-  });
+    Object(_core__WEBPACK_IMPORTED_MODULE_0__["default"])(target).click(e => {
+      if (e.target.classList.contains('modal')) {
+        Object(_core__WEBPACK_IMPORTED_MODULE_0__["default"])(target).fadeOut(500);
+        document.body.style.overflow = '';
+        document.body.style.marginRight = `0`;
+
+        if (isCreated) {
+          document.querySelector(target).remove();
+        }
+      }
+    });
+  }
 };
 
 Object(_core__WEBPACK_IMPORTED_MODULE_0__["default"])('[data-toggle="modal"]').modal();
+
+_core__WEBPACK_IMPORTED_MODULE_0__["default"].prototype.createModal = function () {
+  let {
+    text,
+    btns
+  } = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+  for (let i = 0; i < this.length; i++) {
+    let modal = document.createElement('div');
+    modal.classList.add('modal');
+    modal.setAttribute('id', this[i].getAttribute('data-target').replace(/#/, '')); // btns = {count: num, settings: [[text, classname=[], close, cb]]}
+
+    const buttons = [];
+
+    for (let j = 0; j < btns.settings.length; j++) {
+      const {
+        settings
+      } = btns;
+      const setting = settings[j];
+      let btn = document.createElement('button');
+      btn.classList.add('btn', ...setting[1]);
+      btn.textContent = setting[0];
+
+      if (setting[2]) {
+        btn.setAttribute('data-close', 'true');
+      }
+
+      if (setting[3] && typeof setting[3] === 'function') {
+        btn.addEventListener('click', setting[3]);
+      }
+
+      buttons.push(btn);
+    }
+
+    modal.innerHTML = `
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <button class="close" data-close>
+                        <span>&times;</span>
+                    </button>
+                    <div class="modal-header">
+                        <div class="modal-title">
+                            ${text.title}
+                        </div>
+                    </div>
+                    <div class="modal-body">
+                        ${text.body}
+                    </div>
+                    <div class="modal-footer">
+                        
+                    </div>
+                </div>
+            </div>
+        `;
+    modal.querySelector('.modal-footer').append(...buttons);
+    document.body.appendChild(modal);
+    Object(_core__WEBPACK_IMPORTED_MODULE_0__["default"])(this[i]).modal(true);
+    Object(_core__WEBPACK_IMPORTED_MODULE_0__["default"])(this[i].getAttribute('data-target')).fadeIn(500);
+  }
+};
 
 /***/ }),
 
@@ -670,17 +736,31 @@ $('[data-count="second"]').click(function () {
 });
 $('button').eq(3).on('click', () => {
   $('.w-500').fadeToggle(800);
-});
-$('.wrapper').html(`
-    <div class="dropdown">
-    <button class="btn btn-primary dropdown-toggle" id="dropdownMenuButton">Dropdown button</button>
-    <div class="dropdown-menu" data-toggle-id="dropdownMenuButton">
-        <a href="#" class="dropdown-item">Action</a>
-        <a href="#" class="dropdown-item">Effects</a>
-        <a href="#" class="dropdown-item">Style</a>
-    </div>
-    </div>`);
+}); // $('.wrapper').html(`
+//     <div class="dropdown">
+//     <button class="btn btn-primary dropdown-toggle" id="dropdownMenuButton">Dropdown button</button>
+//     <div class="dropdown-menu" data-toggle-id="dropdownMenuButton">
+//         <a href="#" class="dropdown-item">Action</a>
+//         <a href="#" class="dropdown-item">Effects</a>
+//         <a href="#" class="dropdown-item">Style</a>
+//     </div>
+//     </div>`
+// );
+
 $('.dropdown-toggle').dropdown();
+$('#trigger').click(() => $('#trigger').createModal({
+  text: {
+    title: 'Modal title',
+    body: 'Lorem ipsum dolor sit amet consectetur adipisicing elit.'
+  },
+  btns: {
+    settings: [['Close', ['btn-danger', 'mr-10'], true], ['Save changes', ['btn-success'], false, () => {
+      alert('Данные сохранены');
+    }], ['Another btn', ['btn-warning', 'ml-10'], false, () => {
+      alert('hello');
+    }]]
+  }
+}));
 
 /***/ })
 
