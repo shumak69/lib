@@ -86,6 +86,41 @@
 /************************************************************************/
 /******/ ({
 
+/***/ "./src/js/lib/components/accordion.js":
+/*!********************************************!*\
+  !*** ./src/js/lib/components/accordion.js ***!
+  \********************************************/
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../core */ "./src/js/lib/core.js");
+
+
+_core__WEBPACK_IMPORTED_MODULE_0__["default"].prototype.accordion = function () {
+  let headActive = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'accordion-head-active';
+  let contentActive = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'accordion-content-active';
+  let paddings = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 40;
+
+  for (let i = 0; i < this.length; i++) {
+    Object(_core__WEBPACK_IMPORTED_MODULE_0__["default"])(this[i]).click(() => {
+      Object(_core__WEBPACK_IMPORTED_MODULE_0__["default"])(this[i]).toggleClass(headActive);
+      Object(_core__WEBPACK_IMPORTED_MODULE_0__["default"])(this[i].nextElementSibling).toggleClass(contentActive);
+
+      if (this[i].classList.contains(headActive)) {
+        this[i].nextElementSibling.style.maxHeight = this[i].nextElementSibling.scrollHeight + paddings + "px";
+      } else {
+        this[i].nextElementSibling.style.maxHeight = "0px";
+      }
+    });
+  }
+};
+
+Object(_core__WEBPACK_IMPORTED_MODULE_0__["default"])('.accordion-head').accordion();
+
+/***/ }),
+
 /***/ "./src/js/lib/components/dropdown.js":
 /*!*******************************************!*\
   !*** ./src/js/lib/components/dropdown.js ***!
@@ -100,7 +135,7 @@ __webpack_require__.r(__webpack_exports__);
 
 _core__WEBPACK_IMPORTED_MODULE_0__["default"].prototype.dropdown = function () {
   for (let i = 0; i < this.length; i++) {
-    const id = Object(_core__WEBPACK_IMPORTED_MODULE_0__["default"])(this[i]).getAttr('id');
+    const id = this[i].getAttribute('id');
     Object(_core__WEBPACK_IMPORTED_MODULE_0__["default"])(this[i]).click(() => {
       Object(_core__WEBPACK_IMPORTED_MODULE_0__["default"])(`[data-toggle-id="${id}"]`).fadeToggle(300);
     });
@@ -236,6 +271,183 @@ _core__WEBPACK_IMPORTED_MODULE_0__["default"].prototype.createModal = function (
 
 /***/ }),
 
+/***/ "./src/js/lib/components/slider.js":
+/*!*****************************************!*\
+  !*** ./src/js/lib/components/slider.js ***!
+  \*****************************************/
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../core */ "./src/js/lib/core.js");
+
+
+_core__WEBPACK_IMPORTED_MODULE_0__["default"].prototype.slider = function (auto) {
+  for (let i = 0; i < this.length; i++) {
+    const width = window.getComputedStyle(this[i].querySelector('.carousel-inner')).width;
+    const slides = this[i].querySelectorAll('.carousel-item');
+    const slidesField = this[i].querySelector('.carousel-slides');
+    const dots = this[i].querySelectorAll('.carousel-indicators li');
+    slidesField.style.width = 100 * slides.length + '%';
+    slides.forEach(item => {
+      item.style.width = width;
+    });
+    let offset = 0;
+    let slideIndex = 0;
+    Object(_core__WEBPACK_IMPORTED_MODULE_0__["default"])(this[i].querySelector('[data-slide="next"]')).click(e => {
+      e.preventDefault();
+
+      if (offset == +width.replace(/\D/g, '') * (slides.length - 1)) {
+        offset = 0;
+      } else {
+        offset += +width.replace(/\D/g, '');
+      }
+
+      slidesField.style.transform = `translateX(-${offset}px)`;
+
+      if (slideIndex == slides.length - 1) {
+        slideIndex = 0;
+      } else {
+        slideIndex++;
+      }
+
+      dots.forEach(item => {
+        item.classList.remove('active');
+      });
+      dots[slideIndex].classList.add('active');
+    });
+    Object(_core__WEBPACK_IMPORTED_MODULE_0__["default"])(this[i].querySelector('[data-slide="prev"]')).click(e => {
+      e.preventDefault();
+
+      if (offset == 0) {
+        offset = +width.replace(/\D/g, '') * (slides.length - 1);
+      } else {
+        offset -= +width.replace(/\D/g, '');
+      }
+
+      slidesField.style.transform = `translateX(-${offset}px)`;
+
+      if (slideIndex == 0) {
+        slideIndex = slides.length - 1;
+      } else {
+        slideIndex--;
+      }
+
+      dots.forEach(item => {
+        item.classList.remove('active');
+      });
+      dots[slideIndex].classList.add('active');
+    });
+    document.querySelector('.carousel-indicators').addEventListener('click', e => {
+      if (e.target.getAttribute('data-slide-to')) {
+        slideIndex = +e.target.getAttribute('data-slide-to');
+        dots.forEach(item => {
+          item.classList.remove('active');
+        });
+        dots[slideIndex].classList.add('active');
+        offset = +width.replace(/\D/g, '') * slideIndex;
+        slidesField.style.transform = `translateX(-${offset}px)`;
+      }
+    });
+
+    if (typeof auto === 'number') {
+      let interval;
+
+      const activateAnimation = () => {
+        interval = setInterval(() => {
+          this[i].querySelector('[data-slide="next"]').click();
+        }, auto);
+      };
+
+      activateAnimation();
+      this[i].addEventListener('mouseenter', () => {
+        clearInterval(interval);
+      });
+      this[i].addEventListener('mouseleave', () => {
+        activateAnimation();
+      });
+    }
+  }
+};
+
+Object(_core__WEBPACK_IMPORTED_MODULE_0__["default"])('.carousel').slider();
+
+_core__WEBPACK_IMPORTED_MODULE_0__["default"].prototype.createSlider = function (_ref) {
+  let {
+    img,
+    prev,
+    next,
+    auto
+  } = _ref;
+  const carousel = document.createElement('div');
+  carousel.classList.add('carousel');
+  const carouselDots = [];
+  carousel.innerHTML = `
+    <ol class="carousel-indicators">
+        </ol>
+        <div class="carousel-inner">
+            <div class="carousel-slides">
+            </div>
+        </div>
+        <a href="#" class="carousel-prev" data-slide="prev">
+            <span class="carousel-prev-icon">${prev}</span>
+        </a>
+        <a href="#" class="carousel-next" data-slide="next">
+            <span class="carousel-next-icon">${next}</span>
+        </a>
+        `; // console.log(carouselDots);
+
+  for (let i = 0; i < Object.keys(img).length; i++) {
+    const dot = document.createElement('li');
+    dot.setAttribute('data-slide-to', i);
+
+    if (i == 0) {
+      dot.classList.add('active');
+    }
+
+    carousel.querySelector('.carousel-indicators').appendChild(dot);
+    carouselDots.push(dot);
+    const item = document.createElement('div');
+    item.classList.add('carousel-item');
+    item.innerHTML = `<img src="${img[i]}" alt="photo">`;
+    carousel.querySelector('.carousel-slides').appendChild(item);
+  } // document.querySelector('.carousel-indicators').innerHTML = carouselDots;
+
+
+  document.body.appendChild(carousel);
+
+  if (typeof auto === 'number') {
+    Object(_core__WEBPACK_IMPORTED_MODULE_0__["default"])('.carousel').slider(auto);
+  }
+};
+
+/***/ }),
+
+/***/ "./src/js/lib/components/tab.js":
+/*!**************************************!*\
+  !*** ./src/js/lib/components/tab.js ***!
+  \**************************************/
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../core */ "./src/js/lib/core.js");
+
+
+_core__WEBPACK_IMPORTED_MODULE_0__["default"].prototype.tab = function () {
+  for (let i = 0; i < this.length; i++) {
+    Object(_core__WEBPACK_IMPORTED_MODULE_0__["default"])(this[i]).on('click', () => {
+      Object(_core__WEBPACK_IMPORTED_MODULE_0__["default"])(this[i]).addClass('tab-item-active').siblings().removeClass('tab-item-active').closest('.tab').find('.tab-content').removeClass('tab-content-active').eq(Object(_core__WEBPACK_IMPORTED_MODULE_0__["default"])(this[i]).index()).addClass('tab-content-active');
+    });
+  }
+};
+
+Object(_core__WEBPACK_IMPORTED_MODULE_0__["default"])('[data-tabpanel] .tab-item').tab();
+
+/***/ }),
+
 /***/ "./src/js/lib/core.js":
 /*!****************************!*\
   !*** ./src/js/lib/core.js ***!
@@ -289,6 +501,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _modules_effects__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./modules/effects */ "./src/js/lib/modules/effects.js");
 /* harmony import */ var _components_dropdown__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./components/dropdown */ "./src/js/lib/components/dropdown.js");
 /* harmony import */ var _components_modal__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./components/modal */ "./src/js/lib/components/modal.js");
+/* harmony import */ var _components_tab__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./components/tab */ "./src/js/lib/components/tab.js");
+/* harmony import */ var _components_accordion__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./components/accordion */ "./src/js/lib/components/accordion.js");
+/* harmony import */ var _components_slider__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./components/slider */ "./src/js/lib/components/slider.js");
+/* harmony import */ var _services_request__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./services/request */ "./src/js/lib/services/request.js");
+/* harmony import */ var _services_request__WEBPACK_IMPORTED_MODULE_12___default = /*#__PURE__*/__webpack_require__.n(_services_request__WEBPACK_IMPORTED_MODULE_12__);
+
+
+
+
 
 
 
@@ -401,7 +622,6 @@ _core__WEBPACK_IMPORTED_MODULE_0__["default"].prototype.closest = function (sele
 };
 
 _core__WEBPACK_IMPORTED_MODULE_0__["default"].prototype.siblings = function () {
-  console.log([...this[0].parentElement.children]);
   const newObj = [...this[0].parentElement.children].filter(item => item !== this[0]);
 
   for (let i = 0; i < this.length; i++) {
@@ -631,6 +851,7 @@ _core__WEBPACK_IMPORTED_MODULE_0__["default"].prototype.fadeOut = function (dur,
 _core__WEBPACK_IMPORTED_MODULE_0__["default"].prototype.fadeToggle = function (dur, display, fin) {
   for (let i = 0; i < this.length; i++) {
     if (window.getComputedStyle(this[i]).display === 'none') {
+      console.log('1');
       this[i].style.display = display || 'block';
 
       const _fadeIn = complection => {
@@ -640,6 +861,8 @@ _core__WEBPACK_IMPORTED_MODULE_0__["default"].prototype.fadeToggle = function (d
       const ani = this.animateOverTime(dur, _fadeIn, fin);
       requestAnimationFrame(ani);
     } else {
+      console.log('2');
+
       const _fadeOut = complection => {
         this[i].style.opacity = 1 - complection;
 
@@ -651,6 +874,8 @@ _core__WEBPACK_IMPORTED_MODULE_0__["default"].prototype.fadeToggle = function (d
       const ani = this.animateOverTime(dur, _fadeOut, fin);
       requestAnimationFrame(ani);
     }
+
+    console.log(this.length + 'f');
   }
 
   return this;
@@ -708,6 +933,17 @@ _core__WEBPACK_IMPORTED_MODULE_0__["default"].prototype.click = function (handle
 
 /***/ }),
 
+/***/ "./src/js/lib/services/request.js":
+/*!****************************************!*\
+  !*** ./src/js/lib/services/request.js ***!
+  \****************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+
+
+/***/ }),
+
 /***/ "./src/js/main.js":
 /*!************************!*\
   !*** ./src/js/main.js ***!
@@ -746,8 +982,8 @@ $('button').eq(3).on('click', () => {
 //     </div>
 //     </div>`
 // );
+// $('.dropdown-toggle').dropdown();
 
-$('.dropdown-toggle').dropdown();
 $('#trigger').click(() => $('#trigger').createModal({
   text: {
     title: 'Modal title',
@@ -761,6 +997,12 @@ $('#trigger').click(() => $('#trigger').createModal({
     }]]
   }
 }));
+$('').createSlider({
+  img: ['https://ipiccy.com/res/template/img/hp_v2/pics/ba-01s3.jpg', 'https://images.pexels.com/photos/1363876/pexels-photo-1363876.jpeg?cs=srgb&dl=calm-body-of-water-1363876.jpg&fm=jpg', 'https://pixlr.com/images/best-photo-editor-cover.jpg'],
+  prev: '&lt;',
+  next: '&gt;',
+  auto: 3000
+});
 
 /***/ })
 

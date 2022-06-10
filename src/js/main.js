@@ -35,7 +35,7 @@ $('button').eq(3).on('click', () => {
 // );
 
 
-$('.dropdown-toggle').dropdown();
+// $('.dropdown-toggle').dropdown();
 
 $('#trigger').click(() => $('#trigger').createModal({
     text: {
@@ -68,4 +68,16 @@ $('#trigger').click(() => $('#trigger').createModal({
         ]
     }
 }));
+
+$('').createSlider({
+    img: [
+        'https://ipiccy.com/res/template/img/hp_v2/pics/ba-01s3.jpg', 
+        'https://images.pexels.com/photos/1363876/pexels-photo-1363876.jpeg?cs=srgb&dl=calm-body-of-water-1363876.jpg&fm=jpg', 
+        'https://pixlr.com/images/best-photo-editor-cover.jpg'
+    ],
+    prev: '&lt;',
+    next: '&gt;',
+    auto: 3000
+});
+
 

@@ -80,7 +80,6 @@ $.prototype.closest = function (selector) {
 };
 
 $.prototype.siblings = function () {
-    console.log([...this[0].parentElement.children]);
     const newObj = [...this[0].parentElement.children].filter(item => item !== this[0]);
     
     for (let i = 0; i < this.length; i++) {
