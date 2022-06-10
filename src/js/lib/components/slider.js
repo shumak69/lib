@@ -51,17 +51,20 @@ $.prototype.slider = function (auto) {
             });
             dots[slideIndex].classList.add('active');
         });
-        document.querySelector('.carousel-indicators').addEventListener('click', (e) => {
-            if(e.target.getAttribute('data-slide-to')) {
-                slideIndex = +e.target.getAttribute('data-slide-to');
-                dots.forEach(item => {
-                    item.classList.remove('active');
-                });
-                dots[slideIndex].classList.add('active');
-                offset = +width.replace(/\D/g,'') * slideIndex;
-                slidesField.style.transform = `translateX(-${offset}px)`;
-            }
-        });
+        try{
+            document.querySelector('.carousel-indicators').addEventListener('click', (e) => {
+                if(e.target.getAttribute('data-slide-to')) {
+                    slideIndex = +e.target.getAttribute('data-slide-to');
+                    dots.forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    dots[slideIndex].classList.add('active');
+                    offset = +width.replace(/\D/g,'') * slideIndex;
+                    slidesField.style.transform = `translateX(-${offset}px)`;
+                }
+            });
+        } catch(e){}
+        
         if(typeof(auto) === 'number') {
             let interval;
             const activateAnimation = () => {
@@ -118,5 +121,7 @@ $.prototype.createSlider = function ({img, prev, next, auto}) {
     document.body.appendChild(carousel);
     if(typeof(auto) === 'number') {
         $('.carousel').slider(auto);
+    } else {
+        $('.carousel').slider();
     }
 };

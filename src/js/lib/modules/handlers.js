@@ -4,19 +4,23 @@ $.prototype.on = function (eventName, callback) {
     if(!eventName || !callback) {
         return this;
     }
-    for(let i = 0; i < this.length; i++) {
-        this[i].addEventListener(eventName, callback);
-    }
-    return this;
+    try{
+        for(let i = 0; i < this.length; i++) {
+            this[i].addEventListener(eventName, callback);
+        }
+        return this; 
+    }catch(e){}
 };
 
 $.prototype.off = function (eventName, callback) {
     if(!eventName || !callback) {
         return this;
     }
-    for(let i = 0; i < this.length; i++) {
-        this[i].removeEventListener(eventName, callback);
-    }
+    try{
+        for(let i = 0; i < this.length; i++) {
+            this[i].removeEventListener(eventName, callback);
+        }
+    } catch(e){}
     return this;
 };
 
